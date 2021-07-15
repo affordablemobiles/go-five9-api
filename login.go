@@ -106,7 +106,7 @@ func (api *Five9APIClient) startSession(ctx context.Context) error {
 		SetHeaderVerbatim("farmId", api.token.Context.FarmID).
 		SetBody(request).
 		SetContext(ctx).
-		Put(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/session_start", api.token.UserID))
+		Put(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/session_start?force=true", api.token.UserID))
 	if err != nil {
 		return fmt.Errorf("Session Start call error: %s", err)
 	}
