@@ -22,11 +22,13 @@ func TestPasswd(t *testing.T) {
 	)
 	if err != nil {
 		t.Errorf("Failed to perform login: %s", err)
+		return
 	}
 
 	pwd, err := pgen.Generate(18, 5, 0, false, false)
 	if err != nil {
 		t.Errorf("Failed to generate password: %s", err)
+		return
 	}
 	pwd = fmt.Sprintf("%s__", pwd)
 
@@ -39,5 +41,6 @@ func TestPasswd(t *testing.T) {
 	)
 	if err != nil {
 		t.Errorf("Failed to change password: %s", err)
+		return
 	}
 }

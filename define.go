@@ -29,6 +29,26 @@ type Token struct {
 	Context struct {
 		FarmID string `json:"farmId"`
 	} `json:"context"`
+	Metadata *Metadata `json:"metadata,omitempty"`
+}
+
+type Metadata struct {
+	DataCenters []DataCenterInfo `json:"dataCenters"`
+}
+
+type DataCenterInfo struct {
+	Name      string        `json:"name"`
+	Active    bool          `json:"active"`
+	APIURLs   []ClusterInfo `json:"apiUrls"`
+	LoginURLs []ClusterInfo `json:"loginUrls"`
+	UIURLs    []ClusterInfo `json:"uiUrls"`
+}
+
+type ClusterInfo struct {
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	RouteKey string `json:"routeKey"`
+	Version  string `json:"version"`
 }
 
 type StationInfo struct {

@@ -29,9 +29,17 @@ func NewFive9APIClient(ctx context.Context, username, password string) (*Five9AP
 	if LoggingEnabled {
 		log.Printf("Performing initial login")
 	}
-	data.token, err = data.performLogin(ctx, username, password)
-	if err != nil {
-		return nil, err
+	for {
+		baseURL := data.getBaseURL()
+
+		data.token, err = data.performLogin(ctx, username, password)
+		if err != nil {
+			return nil, err
+		}
+
+		if baseURL == data.getBaseURL() {
+			break
+		}
 	}
 
 	err = data.handleStateChange(ctx)

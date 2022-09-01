@@ -26,7 +26,7 @@ func (api *Five9APIClient) ChangePassword(ctx context.Context, oldPassword, newP
 		SetHeaderVerbatim("farmId", api.token.Context.FarmID).
 		SetBody(request).
 		SetContext(ctx).
-		Put(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/password", api.token.UserID))
+		Put(fmt.Sprintf("%s/appsvcs/rs/svc/agents/%s/password", api.getBaseURL(), api.token.UserID))
 	if err != nil {
 		return fmt.Errorf("Password change call error: %s", err)
 	}

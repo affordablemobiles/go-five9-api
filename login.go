@@ -27,7 +27,7 @@ func (api *Five9APIClient) performLogin(ctx context.Context, username, password 
 		ForceContentType("application/json").
 		SetResult(result).
 		SetContext(ctx).
-		Post("https://app.five9.com/appsvcs/rs/svc/auth/login")
+		Post(fmt.Sprintf("%s/appsvcs/rs/svc/auth/login", api.getBaseURL()))
 	if err != nil {
 		return nil, fmt.Errorf("Login call error: %s", err)
 	}
@@ -37,6 +37,20 @@ func (api *Five9APIClient) performLogin(ctx context.Context, username, password 
 	}
 
 	return resp.Result().(*Token), nil
+}
+
+func (api *Five9APIClient) getBaseURL() string {
+	if api.token != nil && api.token.Metadata != nil {
+		for _, dc := range api.token.Metadata.DataCenters {
+			if dc.Active {
+				if len(dc.APIURLs) >= 1 {
+					return fmt.Sprintf("https://%s:%s", dc.APIURLs[0].Host, dc.APIURLs[0].Port)
+				}
+			}
+		}
+	}
+
+	return "https://app.five9.com"
 }
 
 func (api *Five9APIClient) handleStateChange(ctx context.Context) error {
@@ -81,7 +95,7 @@ func (api *Five9APIClient) getLoginState(ctx context.Context) (string, error) {
 		SetHeader("Authorization", fmt.Sprintf("Bearer-%s", api.token.TokenID)).
 		SetHeaderVerbatim("farmId", api.token.Context.FarmID).
 		SetContext(ctx).
-		Get(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/login_state", api.token.UserID))
+		Get(fmt.Sprintf("%s/appsvcs/rs/svc/agents/%s/login_state", api.getBaseURL(), api.token.UserID))
 	if err != nil {
 		return "", fmt.Errorf("Login State call error: %s", err)
 	}
@@ -106,7 +120,7 @@ func (api *Five9APIClient) startSession(ctx context.Context) error {
 		SetHeaderVerbatim("farmId", api.token.Context.FarmID).
 		SetBody(request).
 		SetContext(ctx).
-		Put(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/session_start?force=true", api.token.UserID))
+		Put(fmt.Sprintf("%s/appsvcs/rs/svc/agents/%s/session_start?force=true", api.getBaseURL(), api.token.UserID))
 	if err != nil {
 		return fmt.Errorf("Session Start call error: %s", err)
 	}
@@ -133,7 +147,7 @@ func (api *Five9APIClient) acceptNotices(ctx context.Context) error {
 			SetHeader("Authorization", fmt.Sprintf("Bearer-%s", api.token.TokenID)).
 			SetHeaderVerbatim("farmId", api.token.Context.FarmID).
 			SetContext(ctx).
-			Put(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/maintenance_notices/%s/accept", api.token.UserID, notice.ID))
+			Put(fmt.Sprintf("%s/appsvcs/rs/svc/agents/%s/maintenance_notices/%s/accept", api.getBaseURL(), api.token.UserID, notice.ID))
 		if err != nil {
 			return fmt.Errorf("Accept Notice call error: %s", err)
 		}
@@ -159,7 +173,7 @@ func (api *Five9APIClient) getNotices(ctx context.Context) ([]*MaintenanceNotice
 		ForceContentType("application/json").
 		SetResult(nList).
 		SetContext(ctx).
-		Get(fmt.Sprintf("https://app.five9.com/appsvcs/rs/svc/agents/%s/maintenance_notices", api.token.UserID))
+		Get(fmt.Sprintf("%s/appsvcs/rs/svc/agents/%s/maintenance_notices", api.getBaseURL(), api.token.UserID))
 	if err != nil {
 		return nil, fmt.Errorf("Error fetching list of notices (call): %s", err)
 	}

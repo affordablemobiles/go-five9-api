@@ -16,5 +16,6 @@ func TestLogin(t *testing.T) {
 	)
 	if err != nil {
 		t.Errorf("Failed to perform login: %s", err)
+		return
 	}
 }
